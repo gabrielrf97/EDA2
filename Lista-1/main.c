@@ -61,8 +61,6 @@ void create_initial_menu(int* index1, int* index2, int* dataArray){
             scanf("%d", &value);
             position = find_slot_for_value(index1, index2, dataArray, value); 
             insert_element_at_position(position, value, dataArray); 
-            index2 = populate_second_index_arr(dataArray);
-            index1 = populate_first_index_arr(index2);    
             break;
         case '2':
             printf("Insira o valor que deseja remover: ");
@@ -71,8 +69,6 @@ void create_initial_menu(int* index1, int* index2, int* dataArray){
             if(position != -1){
                 printf("Removendo elemento [%d] = %d\n", position, dataArray[position]);
                 remove_element_at_position(position, dataArray); 
-                index2 = populate_second_index_arr(dataArray);
-                index1 = populate_first_index_arr(index2);    
             } 
             else{
                 printf("%d não existe no vetor.\n", value);
@@ -125,8 +121,14 @@ int* populate_data_vector(int size, float securityMargin, int* emptyPositionTrac
 }
 
 int binarySearch(int* dataArray, int startPos, int endPos, int value){
+    if(endPos >= initialVectorSize){
+        endPos = initialVectorSize-1;
+    }
+    while(dataArray[endPos] == 0){
+        endPos--;
+    }
     int index = (startPos+endPos)/2;
-    printf("DEBUG: Index: [%d] = %d\n", index, dataArray[index]);
+    printf("DEBUG: Index: [%d] = %d\nInicio: [%d] = %d\nFim: [%d] = %d\n", index, dataArray[index], startPos, dataArray[startPos], endPos, dataArray[endPos]);
     if(dataArray[index] == value){
         return index;
     }
@@ -135,10 +137,10 @@ int binarySearch(int* dataArray, int startPos, int endPos, int value){
     }
     else{
         if(dataArray[index] > value){
-            return binarySearch(dataArray, startPos, index, value);
+            return binarySearch(dataArray, startPos, index-1, value);
         }
         else{
-            return binarySearch(dataArray, index, endPos, value);
+            return binarySearch(dataArray, index+1, endPos, value);
         }
     }
 }
