@@ -6,6 +6,8 @@
 //  Copyright © 2018 AppleDeveloperAcademyUCB. All rights reserved.
 //
 
+// programa falha para casos em que o numero é inserido no fim do intervalo, ex: 8999, 7599, 4999, etc...
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -18,6 +20,7 @@ int* populate_second_index_arr(int* dataArray);
 int* populate_first_index_arr(int* index2);
 void create_initial_menu(int* index1, int* index2, int* dataArray);
 int find_slot_for_value(int* index1, int* index2, int* dataArray, int number);
+int find_value_position(int* index1, int* index2, int* dataArray, int value); 
 
 int main(int argc, const char * argv[]) {
     
@@ -35,8 +38,10 @@ int main(int argc, const char * argv[]) {
 }
 
 void create_initial_menu(int* index1, int* index2, int* dataArray){
+    void insert_element_at_position(int position, int value, int* dataArray);
+    void remove_element_at_position(int position, int* dataArray);
     char userInput;
-    int value;
+    int value, position;
     do{
         printf("*****************************\n");
         printf("* Escolha sua ação:         *\n");
@@ -52,18 +57,41 @@ void create_initial_menu(int* index1, int* index2, int* dataArray){
         }while(userInput == '\n');
         switch (userInput) {
         case '1':
-                printf("Insira o valor que deseja inserir: ");
-                scanf("%d", &value);
-                find_slot_for_value(index1, index2, dataArray, value);  
+            printf("Insira o valor que deseja inserir: ");
+            scanf("%d", &value);
+            position = find_slot_for_value(index1, index2, dataArray, value); 
+            insert_element_at_position(position, value, dataArray); 
+            index2 = populate_second_index_arr(dataArray);
+            index1 = populate_first_index_arr(index2);    
             break;
-//        case '2':
-//                 mesma coisa do alg anterior, so que da shiftback, e tem que ver se o numero existe ou remover pelo index dele( a segunda é mais facil)
-//            break;
-//        case '3':
-//                 parecido com o case 1, so que sem validar se tem espaço e sem dar shift, obviamente
-//            break;
+        case '2':
+            printf("Insira o valor que deseja remover: ");
+            scanf("%d", &value);
+            position = find_value_position(index1, index2, dataArray, value);
+            if(position != -1){
+                printf("Removendo elemento [%d] = %d\n", position, dataArray[position]);
+                remove_element_at_position(position, dataArray); 
+                index2 = populate_second_index_arr(dataArray);
+                index1 = populate_first_index_arr(index2);    
+            } 
+            else{
+                printf("%d não existe no vetor.\n", value);
+            }
+
+            break;
+        case '3':
+            printf("Insira o valor que deseja remover: ");
+            scanf("%d", &value);
+            position = find_value_position(index1, index2, dataArray, value);
+            if(position != -1){
+                printf("%d está na posição [%d]\n", value, position);
+            }                                 
+            else{
+                printf("%d não existe no vetor.\n", value);
+            }
+            break;
 //        case '4':
-                    //printa o emptyPositionTracker
+                      //printa o emptyPositionTracker
         case '5':
             //do nothing
             break;
@@ -96,6 +124,48 @@ int* populate_data_vector(int size, float securityMargin, int* emptyPositionTrac
     return vector;
 }
 
+int binarySearch(int* dataArray, int startPos, int endPos, int value){
+    int index = (startPos+endPos)/2;
+    printf("DEBUG: Index: [%d] = %d\n", index, dataArray[index]);
+    if(dataArray[index] == value){
+        return index;
+    }
+    if(endPos == startPos){
+        return -1; //elemento não encontrado;
+    }
+    else{
+        if(dataArray[index] > value){
+            return binarySearch(dataArray, startPos, index, value);
+        }
+        else{
+            return binarySearch(dataArray, index, endPos, value);
+        }
+    }
+}
+
+int find_value_position(int* index1, int* index2, int* dataArray, int value){
+    int binarySearch(int* dataArray, int startPos, int endPos, int value);
+    int get_first_index_position(int* index1, int number);
+    int get_second_index_position(int* index2, int number, int first_index_position);
+
+    int first_index_position = get_first_index_position(index1, value);
+    int second_index_position = get_second_index_position(index2, value, first_index_position);
+    int startPos = second_index_position*100;
+    int endPos = (second_index_position + 1)*100;
+    while(dataArray[endPos] == 0){
+        endPos--;
+    }
+    return binarySearch(dataArray, startPos, endPos, value);
+}
+
+void remove_element_at_position(int position, int* dataArray){
+    int buffer;
+    do{
+        buffer = dataArray[position+1];
+        dataArray[position++] = buffer;
+    }while(buffer != 0); 
+}
+
 //Criar index secundário, que vai apontar para o vetor original/pula de 100 em 100
 int* populate_second_index_arr(int* dataArray){
     int *index2 = calloc( size_index_2 , sizeof(int));
@@ -103,6 +173,18 @@ int* populate_second_index_arr(int* dataArray){
         index2[i] = dataArray[i * 100];
     }
     return index2;
+}
+
+void insert_element_at_position(int position, int value, int* dataArray){
+    int index = position;
+    while(dataArray[index] != 0){
+        index++;
+    }
+    while(index > position+1){
+        dataArray[index] = dataArray[index-1];
+        index--;
+    }
+    dataArray[position] = value;
 }
 
 //Criar index primário, que aponta para o vetor secundario, pula de 10 em 10
@@ -123,8 +205,8 @@ int find_slot_for_value(int* index1, int* index2, int* dataArray, int number){
     int first_index_position = get_first_index_position(index1, number);
     int second_index_position = get_second_index_position(index2, number, first_index_position);
     int position = get_position_in_data_vector(dataArray, number, second_index_position);
-    //printf("* DEBUG:\n* Valor: %d\n* Anterior: [%d] = %d\n* Próximo: [%d] = %d\n",number, position, dataArray[position], position+1, dataArray[position+1]);
-    return position;
+    printf("* DEBUG:\n* Valor: %d\n* Anterior: [%d] = %d\n* Próximo: [%d] = %d\n",number, position, dataArray[position], position+1, dataArray[position+1]);
+    return position+1;
 }
 
 int get_first_index_position(int* index1, int number){
@@ -152,7 +234,6 @@ int get_second_index_position(int* index2, int number, int first_index_position)
     }
     return position;
 }
-
 
 int get_position_in_data_vector(int* dataArray, int number, int second_index_position){
     int startPos = second_index_position*100;
