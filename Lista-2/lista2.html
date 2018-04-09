@@ -2,7 +2,7 @@
 <html>
     <style>
         canvas{
-        
+
         width:100% !important;
         height:40% !important;
         display: inline;
@@ -14,7 +14,7 @@
 <form onsubmit="return setArrayGrow()">
   Array deverá crescer em: <input type="text" id="arrayGrow" size="20" name="arrayGrow"><br>
   Numero de iterações: <input type="text" id="iterations" size="20" name="iterations"><br>
-  <input type="submit" value="Submit">  
+  <input type="submit" value="Submit">
 </form>
 <canvas id="myChart"></canvas>
 <canvas id="myChart2"></canvas>
@@ -36,7 +36,7 @@
   var myChart2 = genereteNewBarChart(ctx2, 'Vetor Organizado');
   var ctx3 = document.getElementById("myChart3").getContext('2d');
   var myChart3 = genereteNewBarChart(ctx3, 'Vetor Desorganizado');
-  
+
   function setArrayGrow() {
       var arrayGrow = document.getElementById("arrayGrow").value;
       var iterations = document.getElementById("iterations").value;
@@ -65,16 +65,16 @@
           generateArray(); //aqui a gente gera a array aleatória
           myChart3 = genereteNewBarChart(ctx3, 'Vetor Desorganizado');
           elementsNumber.push(dataArray.length);
-          var a = performance.now(); 
+          var a = performance.now();
           bubbleSort(dataArray); //faz o bubble sort feio
-          var b = performance.now(); 
+          var b = performance.now();
           timeSpent.push(b-a);
           myChart = genereteNewChart();
         }
         myChart2 = genereteNewBarChart(ctx2, 'Vetor Organizado');
         return false;
       }
-      
+
   }
 
   function genereteNewChart(){
@@ -175,7 +175,7 @@
       arrayLabels.push(i);
     }
     shuffleArray(dataArray);
-  }  
+  }
 
   function bubbleSort(array) //faz o bubble
   {

@@ -214,7 +214,7 @@
     } else {
       var swapPosition = array[position * 2 + 1] > array[position * 2 + 2] ? position * 2 + 1 : position * 2 + 2;
       swap(array, position, swapPosition);
-      isHeaped(array, swapPosition);
+      heapfy(array, swapPosition);
     }
   }
 
