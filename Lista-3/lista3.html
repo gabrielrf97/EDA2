@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+    <style>
+        canvas{
+
+        width:100% !important;
+        height:40% !important;
+        display: inline;
+        }
+      </style>
+<body>
+<h2> Heap Sort </h2>
+<p style = "display: inline">Avisos:</p>
+<p id = "warnings" style = "display: inline"></p>
+<form onsubmit="return setArrayGrow()" style = "display: inline">
+  Array deverá crescer em: <input type="text" id="arrayGrow" size="20" name="arrayGrow"><br>
+  Numero de iterações: <input type="text" id="iterations" size="20" name="iterations"><br>
+  <input type="submit" value="Submit">
+</form>
+<canvas id="myChart"></canvas>
+<canvas id="myChart2"></canvas>
+<canvas id="myChart3"></canvas>
+<script src="chart.js"></script>
+<script>
+  //Variáveis globais (so bad)
+  var arrayGrowValue;
+  var iterationsValue;
+  var arrayLabels = new Array();
+  var elementsNumber = new Array();
+  var timeSpent = new Array();
+  var generatedArrays = 0;
+  var dataArray = new Array();
+  var date = new Date();
+  var ctx = document.getElementById("myChart").getContext('2d');
+  var myChart = genereteNewChart();
+  var ctx2 = document.getElementById("myChart2").getContext('2d');
+  var myChart2 = genereteNewBarChart(ctx2, 'Vetor Organizado');
+  var ctx3 = document.getElementById("myChart3").getContext('2d');
+  var myChart3 = genereteNewBarChart(ctx3, 'Vetor Desorganizado');
+
+  function setArrayGrow() {
+      var arrayGrow = document.getElementById("arrayGrow").value;
+      var iterations = document.getElementById("iterations").value;
+
+      submitOK = "true";
+      if (isNaN(iterations) || iterations < 1) { //usuário burro
+          document.getElementById("warnings").innerHTML = "As iterações não podem ser nulo ou negativo";
+          iterationsValue = -1;
+          submitOK = "false";
+      }
+      if (isNaN(arrayGrow) || arrayGrow < 1) { //usuário burro
+          document.getElementById("warnings").innerHTML = "O crescimento não pode ser nulo ou negativo";
+          arrayGrowValue = -1;
+          submitOK = "false";
+      }
+      else{ //usuario top
+        arrayGrowValue = arrayGrow;
+        iterationsValue = iterations;
+      }
+
+      if (submitOK == "false") { //usuário burro
+          return false;
+      }
+      else{ //bora fazer as paradinha
+        for(iteractor = 0; iteractor < iterationsValue; iteractor++){ // gera a array n vezes e organiza
+          generateArray(); //aqui a gente gera a array aleatória
+          myChart3 = genereteNewBarChart(ctx3, 'Vetor Desorganizado');
+          elementsNumber.push(dataArray.length);
+          var a = performance.now();
+          buildHeap(dataArray); //faz o heap sort
+          var b = performance.now();
+          timeSpent.push(b-a);
+          myChart = genereteNewChart();
+        }
+        myChart2 = genereteNewBarChart(ctx2, 'Vetor Organizado');
+        return false;
+      }
+  }
+
+  function genereteNewChart(){
+  return  new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: elementsNumber,
+        datasets: [{
+            label: '# of elements',
+            data: timeSpent,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+  });
+  }
+  function genereteNewBarChart(CTX, newLabel){
+  return  new Chart(CTX, {
+    type: 'line',
+    data: {
+        labels: arrayLabels,
+        datasets: [{
+            label: newLabel,
+            data: dataArray,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+  });
+  }
+  /**
+  * Randomize array element order in-place.
+  * Using Durstenfeld shuffle algorithm.
+  */
+  function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+  }
+
+  function generateArray(){ //gera a array com numeros aleatorios entre o e 10000
+    generatedArrays++;
+    dataArray = [];
+    arrayLabels = [];
+    for(i = 0; i < generatedArrays*arrayGrowValue; i++){
+      dataArray.push(i);
+      arrayLabels.push(i);
+    }
+    shuffleArray(dataArray);
+  }
+
+  function buildHeap(array) {
+    for(var i = array.length - 1; i > 0 / 2; i--) {
+      if (i % 2 == 0 ) {
+        if (array[i] > array[i/2 - 1]) {
+          swap(array, i, i/2-1);
+          heapfy(array, i);
+        }
+      } else {
+        if (array[i] > array[i/2]) {
+          swap(array, i, i/2);
+          heapfy(array, i);
+        }
+      }
+    }
+    sort(array);
+  }
+
+  function swap(array, pos1, pos2) {
+    var aux = array[pos1];
+    array[pos1] = array[pos2];
+    array[pos2] = aux;
+  }
+
+  function sort(array){
+    var sentinel = array.length-1
+    for(var i = 0; i < sentinel; sentinel--){
+      swap(array, i, sentinel);
+      heapfy(array, i);
+    }
+  }
+
+  function heapfy(array, position) {
+    if (array[position] > array[position * 2 + 1] && array[position] > array[position * 2 + 2]) {
+      return
+    } else {
+      var swapPosition = array[position * 2 + 1] > array[position * 2 + 2] ? position * 2 + 1 : position * 2 + 2;
+      swap(array, position, swapPosition);
+      isHeaped(array, swapPosition);
+    }
+  }
+
+  // function mergeSort(array){
+  //
+  //   var infLimit = 0;
+  //   var supLimit = array.length - 1;
+  //
+  //   for (var blockSize = 1; blockSize < supLimit; blockSize *= 2) {
+  //     for (var inf = infLimit; inf < supLimit; inf += blockSize * 2) {
+  //       var sup = Math.min(inf + 2 * blockSize - 1, supLimit);
+  //       var mid = inf + blockSize - 1;
+  //       merge(array, inf, mid, sup)
+  //     }
+  //   }
+  // }
+  //
+  // function merge(array, inf, mid, sup){
+  //
+  //   var leftTracker = inf, rightTracker = mid + 1;
+  //   var auxArray = new Array();
+  //
+  //   //Chossing the smallest
+  //   while (leftTracker <= mid && rightTracker <= sup) {
+  //     if (array[leftTracker] <= array[rightTracker]) {
+  //       auxArray.push(array[leftTracker]);
+  //       leftTracker++;
+  //     } else {
+  //       auxArray.push(array[rightTracker]);
+  //       rightTracker++;
+  //     }
+  //   }
+  //
+  //   //Copying remanescent values
+  //   while (leftTracker <= mid) {
+  //     auxArray.push(array[leftTracker]);
+  //     leftTracker++;
+  //   }
+  //
+  //   while (rightTracker <= sup) {
+  //     auxArray.push(array[rightTracker]);
+  //     rightTracker++;
+  //   }
+  //
+  //   //Copying ordered values to original array
+  //   for (var i = 0; i < auxArray.length - 1; i++) {
+  //     array[inf] = auxArray[i];
+  //   }
+  // }
+</script>
+
+</body>
+</html>
