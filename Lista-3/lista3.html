@@ -2,7 +2,6 @@
 <html>
     <style>
         canvas{
-
         width:100% !important;
         height:40% !important;
         display: inline;
@@ -25,6 +24,8 @@
   //Variáveis globais (so bad)
   var arrayGrowValue;
   var iterationsValue;
+  var sentinel;
+  var organizedDataArray = new Array();
   var arrayLabels = new Array();
   var elementsNumber = new Array();
   var timeSpent = new Array();
@@ -37,11 +38,9 @@
   var myChart2 = genereteNewBarChart(ctx2, 'Vetor Organizado');
   var ctx3 = document.getElementById("myChart3").getContext('2d');
   var myChart3 = genereteNewBarChart(ctx3, 'Vetor Desorganizado');
-
   function setArrayGrow() {
       var arrayGrow = document.getElementById("arrayGrow").value;
       var iterations = document.getElementById("iterations").value;
-
       submitOK = "true";
       if (isNaN(iterations) || iterations < 1) { //usuário burro
           document.getElementById("warnings").innerHTML = "As iterações não podem ser nulo ou negativo";
@@ -57,7 +56,6 @@
         arrayGrowValue = arrayGrow;
         iterationsValue = iterations;
       }
-
       if (submitOK == "false") { //usuário burro
           return false;
       }
@@ -67,7 +65,7 @@
           myChart3 = genereteNewBarChart(ctx3, 'Vetor Desorganizado');
           elementsNumber.push(dataArray.length);
           var a = performance.now();
-          buildHeap(dataArray); //faz o heap sort
+          dataArray = buildHeap(dataArray); //faz o heap sort
           var b = performance.now();
           timeSpent.push(b-a);
           myChart = genereteNewChart();
@@ -76,7 +74,6 @@
         return false;
       }
   }
-
   function genereteNewChart(){
   return  new Chart(ctx, {
     type: 'line',
@@ -165,8 +162,7 @@
         array[j] = temp;
     }
   }
-
-  function generateArray(){ //gera a array com numeros aleatorios entre o e 10000
+  function generateArray(){ //gera a array com numeros aleatorios entre o e o valor maximo
     generatedArrays++;
     dataArray = [];
     arrayLabels = [];
@@ -176,48 +172,60 @@
     }
     shuffleArray(dataArray);
   }
-
   function buildHeap(array) {
-    for(var i = array.length - 1; i > 0 / 2; i--) {
+    sentinel = array.length-1;
+    for(var i = array.length - 1; i > 0; i--) {
       if (i % 2 == 0 ) {
-        if (array[i] > array[i/2 - 1]) {
-          swap(array, i, i/2-1);
-          heapfy(array, i);
+        //alert("i = " + array[i] + "\ni/2-1 = " + array[Math.floor(i/2) - 1]);
+        if (array[i] > array[Math.floor(i/2)]) {
+          swap(array, i, Math.floor(i/2));
+          heapfy(array, Math.floor(i/2));
         }
       } else {
-        if (array[i] > array[i/2]) {
-          swap(array, i, i/2);
-          heapfy(array, i);
+        //alert("i = " + array[i] + "\ni/2 = " + array[Math.floor(i/2)]);
+        if (array[i] > array[Math.floor(i/2)]) {
+          swap(array, i, Math.floor(i/2));
+          heapfy(array, Math.floor(i/2));
         }
       }
     }
     sort(array);
+    return array;
   }
-
   function swap(array, pos1, pos2) {
     var aux = array[pos1];
     array[pos1] = array[pos2];
     array[pos2] = aux;
   }
-
   function sort(array){
-    var sentinel = array.length-1
-    for(var i = 0; i < sentinel; sentinel--){
+    for(var i = 0; i <= sentinel; sentinel--){
       swap(array, i, sentinel);
+      organizedDataArray.unshift(array.pop());
       heapfy(array, i);
     }
   }
-
   function heapfy(array, position) {
-    if (array[position] > array[position * 2 + 1] && array[position] > array[position * 2 + 2]) {
-      return
+    if (position * 2 + 1 > sentinel && position * 2 + 2 > sentinel) {
+        return
+    }
+    if (position * 2 + 1 < sentinel && position * 2 + 2 < sentinel) {
+        if (array[position] > array[position * 2 + 1] && array[position] > array[position * 2 + 2]) {
+        return
+        } else {
+            var swapPosition = array[position * 2 + 1] > array[position * 2 + 2] ? position * 2 + 1 : position * 2 + 2;
+            swap(array, position, swapPosition);
+            heapfy(array, swapPosition);
+        }
     } else {
-      var swapPosition = array[position * 2 + 1] > array[position * 2 + 2] ? position * 2 + 1 : position * 2 + 2;
-      swap(array, position, swapPosition);
-      heapfy(array, swapPosition);
+        if (array[position] > array[position * 2 + 1]) {
+           return
+        } else {
+            var swapPosition = position * 2 + 1;
+            swap(array, position, swapPosition);
+            heapfy(array, swapPosition);
+        }
     }
   }
-
   // function mergeSort(array){
   //
   //   var infLimit = 0;
