@@ -64,6 +64,7 @@
         for(iteractor = 0; iteractor < iterationsValue; iteractor++){ // gera a array n vezes e organiza
           generateArray(); //aqui a gente gera a array aleatória
           desorganizedDataArray = dataArray.slice(0);
+          organizedDataArray = [];
           elementsNumber.push(dataArray.length);
           var a = performance.now();
           dataArray = buildHeap(dataArray); //faz o heap sort
@@ -179,15 +180,17 @@
     for(var i = array.length - 1; i > 0; i--) {
       if (i % 2 == 0 ) {
         //alert("i = " + array[i] + "\ni/2-1 = " + array[Math.floor(i/2) - 1]);
-        if (array[i] > array[Math.floor(i/2)]) {
-          swap(array, i, Math.floor(i/2));
-          heapfy(array, Math.floor(i/2));
+        if (array[i] > array[Math.floor(i/2)-1]) {
+          swap(array, i, Math.floor(i/2)-1);
+          heapfy(array, Math.floor(i/2)-1, dataArray.length-1);
+          heapfy(array, i, dataArray.length-1);
         }
       } else {
         //alert("i = " + array[i] + "\ni/2 = " + array[Math.floor(i/2)]);
         if (array[i] > array[Math.floor(i/2)]) {
           swap(array, i, Math.floor(i/2));
-          heapfy(array, Math.floor(i/2));
+          heapfy(array, Math.floor(i/2), dataArray.length-1);
+          heapfy(array, i, dataArray.length-1);
         }
       }
     }
@@ -200,80 +203,35 @@
     array[pos2] = aux;
   }
   function sort(array){
-    for(var i = 0; i <= sentinel; sentinel--){
-      swap(array, i, sentinel);
+    for(var sentinel = dataArray.length-1; sentinel >= 0; sentinel--){
+      swap(array, 0, sentinel);
       organizedDataArray.unshift(array.pop());
-      heapfy(array, i);
+      heapfy(array, 0, sentinel-1);
     }
   }
-  function heapfy(array, position) {
-    if (position * 2 + 1 > sentinel && position * 2 + 2 > sentinel) {
+  function heapfy(array, position, highestIndex) {
+    if (position * 2 + 1 > highestIndex && position * 2 + 2 > highestIndex) {
         return
     }
-    if (position * 2 + 1 < sentinel && position * 2 + 2 < sentinel) {
+    if (position * 2 + 1 < highestIndex && position * 2 + 2 < highestIndex) {
         if (array[position] > array[position * 2 + 1] && array[position] > array[position * 2 + 2]) {
         return
         } else {
             var swapPosition = array[position * 2 + 1] > array[position * 2 + 2] ? position * 2 + 1 : position * 2 + 2;
             swap(array, position, swapPosition);
-            heapfy(array, swapPosition);
+            heapfy(array, swapPosition, dataArray.length-1);
+            heapfy(array, swapPosition, dataArray.length-1);
         }
     } else {
-        if (array[position] > array[position * 2 + 1]) {
+        if (position * 2 + 1 < dataArray.length && array[position] > array[position * 2 + 1]) {
            return
         } else {
             var swapPosition = position * 2 + 1;
             swap(array, position, swapPosition);
-            heapfy(array, swapPosition);
+            heapfy(array, swapPosition, dataArray.length-1);
         }
     }
   }
-  // function mergeSort(array){
-  //
-  //   var infLimit = 0;
-  //   var supLimit = array.length - 1;
-  //
-  //   for (var blockSize = 1; blockSize < supLimit; blockSize *= 2) {
-  //     for (var inf = infLimit; inf < supLimit; inf += blockSize * 2) {
-  //       var sup = Math.min(inf + 2 * blockSize - 1, supLimit);
-  //       var mid = inf + blockSize - 1;
-  //       merge(array, inf, mid, sup)
-  //     }
-  //   }
-  // }
-  //
-  // function merge(array, inf, mid, sup){
-  //
-  //   var leftTracker = inf, rightTracker = mid + 1;
-  //   var auxArray = new Array();
-  //
-  //   //Chossing the smallest
-  //   while (leftTracker <= mid && rightTracker <= sup) {
-  //     if (array[leftTracker] <= array[rightTracker]) {
-  //       auxArray.push(array[leftTracker]);
-  //       leftTracker++;
-  //     } else {
-  //       auxArray.push(array[rightTracker]);
-  //       rightTracker++;
-  //     }
-  //   }
-  //
-  //   //Copying remanescent values
-  //   while (leftTracker <= mid) {
-  //     auxArray.push(array[leftTracker]);
-  //     leftTracker++;
-  //   }
-  //
-  //   while (rightTracker <= sup) {
-  //     auxArray.push(array[rightTracker]);
-  //     rightTracker++;
-  //   }
-  //
-  //   //Copying ordered values to original array
-  //   for (var i = 0; i < auxArray.length - 1; i++) {
-  //     array[inf] = auxArray[i];
-  //   }
-  // }
 </script>
 
 </body>
