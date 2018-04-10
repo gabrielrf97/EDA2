@@ -26,6 +26,7 @@
   var iterationsValue;
   var sentinel;
   var organizedDataArray = new Array();
+  var desorganizedDataArray = new Array();
   var arrayLabels = new Array();
   var elementsNumber = new Array();
   var timeSpent = new Array();
@@ -35,9 +36,9 @@
   var ctx = document.getElementById("myChart").getContext('2d');
   var myChart = genereteNewChart();
   var ctx2 = document.getElementById("myChart2").getContext('2d');
-  var myChart2 = genereteNewBarChart(ctx2, 'Vetor Organizado');
+  var myChart2 = genereteNewBarChart(ctx2, 'Vetor Organizado', dataArray);
   var ctx3 = document.getElementById("myChart3").getContext('2d');
-  var myChart3 = genereteNewBarChart(ctx3, 'Vetor Desorganizado');
+  var myChart3 = genereteNewBarChart(ctx3, 'Vetor Desorganizado', organizedDataArray);
   function setArrayGrow() {
       var arrayGrow = document.getElementById("arrayGrow").value;
       var iterations = document.getElementById("iterations").value;
@@ -62,7 +63,7 @@
       else{ //bora fazer as paradinha
         for(iteractor = 0; iteractor < iterationsValue; iteractor++){ // gera a array n vezes e organiza
           generateArray(); //aqui a gente gera a array aleatória
-          myChart3 = genereteNewBarChart(ctx3, 'Vetor Desorganizado');
+          desorganizedDataArray = dataArray.slice(0);
           elementsNumber.push(dataArray.length);
           var a = performance.now();
           dataArray = buildHeap(dataArray); //faz o heap sort
@@ -70,7 +71,8 @@
           timeSpent.push(b-a);
           myChart = genereteNewChart();
         }
-        myChart2 = genereteNewBarChart(ctx2, 'Vetor Organizado');
+        myChart3 = genereteNewBarChart(ctx3, 'Vetor Desorganizado', desorganizedDataArray); 
+        myChart2 = genereteNewBarChart(ctx2, 'Vetor Organizado', organizedDataArray);
         return false;
       }
   }
@@ -112,14 +114,14 @@
     }
   });
   }
-  function genereteNewBarChart(CTX, newLabel){
+  function genereteNewBarChart(CTX, newLabel, array){
   return  new Chart(CTX, {
     type: 'line',
     data: {
         labels: arrayLabels,
         datasets: [{
             label: newLabel,
-            data: dataArray,
+            data: array,
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)',
